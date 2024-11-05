@@ -1,0 +1,22 @@
+{
+  "name": "@ntzrbtr/hardware-detection",
+  "version": "0.0.0",
+  "description": "Simple HTML and JavaScript site to detect a browser's hardware capabilities",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ntzrbtr/hardware-detection.git"
+  },
+  "author": "Thomas Off",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ntzrbtr/hardware-detection/issues"
+  },
+  "homepage": "https://github.com/ntzrbtr/hardware-detection#readme",
+  "devDependencies": {
+    "@biomejs/biome": "1.9.4"
+  }
+}

@@ -1,25 +1,88 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Device Capabilities Explorer</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script type="module" src="app.js"></script>
 </head>
+
 <body class="bg-gray-100 p-8">
   <div class="max-w-4xl mx-auto">
     <h1 class="text-3xl font-bold mb-8">Device Capabilities Explorer</h1>
-    
+
     <div class="space-y-6">
+      <!-- Media Devices -->
+      <div class="bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-xl font-semibold mb-4">Media Devices</h2>
+
+        <!-- Device Selection -->
+        <div class="mb-6">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Select a device to test:</label>
+          <select id="deviceSelect" class="w-full p-2 border rounded">
+            <option value="">Choose a device...</option>
+          </select>
+        </div>
+
+        <!-- Capabilities Testing -->
+        <div class="mb-6">
+          <button id="testDevice"
+            class="bg-blue-500 text-white px-4 py-2 rounded mb-4 hover:bg-blue-600 transition-colors">
+            Test Selected Device
+          </button>
+        </div>
+
+        <!-- Device Information Sections -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Video Inputs -->
+          <div class="border rounded p-4">
+            <h3 class="font-semibold mb-2">Video Inputs</h3>
+            <div id="videoDevices" class="text-sm"></div>
+          </div>
+
+          <!-- Audio Inputs -->
+          <div class="border rounded p-4">
+            <h3 class="font-semibold mb-2">Audio Inputs</h3>
+            <div id="audioDevices" class="text-sm"></div>
+          </div>
+
+          <!-- Audio Outputs -->
+          <div class="border rounded p-4">
+            <h3 class="font-semibold mb-2">Audio Outputs</h3>
+            <div id="audioOutputs" class="text-sm"></div>
+          </div>
+
+          <!-- Capabilities -->
+          <div class="border rounded p-4">
+            <h3 class="font-semibold mb-2">Selected Device Capabilities</h3>
+            <div id="deviceCapabilities" class="text-sm"></div>
+          </div>
+        </div>
+
+        <!-- Preview (for video devices) -->
+        <div class="mt-6">
+          <h3 class="font-semibold mb-2">Video Preview</h3>
+          <video id="preview" autoplay playsinline class="w-full max-w-md mx-auto border rounded hidden"></video>
+        </div>
+      </div>
+
       <!-- USB Devices -->
       <div class="bg-white p-6 rounded-lg shadow-md">
         <h2 class="text-xl font-semibold mb-4">USB Devices</h2>
-        <button id="check-usb" class="bg-blue-500 text-white px-4 py-2 rounded mb-4">List USB Devices</button>
+        <button id="check-usb"
+          class="bg-blue-500 text-white px-4 py-2 rounded mb-4 hover:bg-blue-600 transition-colors">
+          List USB Devices
+        </button>
         <div id="usb-info" class="text-gray-700">Click button to check USB devices...</div>
       </div>
 
       <!-- Bluetooth Devices -->
       <div class="bg-white p-6 rounded-lg shadow-md">
         <h2 class="text-xl font-semibold mb-4">Bluetooth Devices</h2>
-        <button id="check-bluetooth" class="bg-blue-500 text-white px-4 py-2 rounded mb-4">Scan Bluetooth Devices</button>
+        <button id="check-bluetooth"
+          class="bg-blue-500 text-white px-4 py-2 rounded mb-4 hover:bg-blue-600 transition-colors">
+          Scan Bluetooth Devices
+        </button>
         <div id="bluetooth-info" class="text-gray-700">Click button to scan for Bluetooth devices...</div>
       </div>
 
@@ -39,12 +102,6 @@
       <div class="bg-white p-6 rounded-lg shadow-md">
         <h2 class="text-xl font-semibold mb-4">Network Information</h2>
         <div id="network-info" class="text-gray-700">Checking network status...</div>
-      </div>
-
-      <!-- Media Devices -->
-      <div class="bg-white p-6 rounded-lg shadow-md">
-        <h2 class="text-xl font-semibold mb-4">Media Devices</h2>
-        <div id="media-devices" class="text-gray-700">Checking available media devices...</div>
       </div>
 
       <!-- Screen Information -->
@@ -67,211 +124,10 @@
     </div>
   </div>
 
-  <script>
-    // USB Devices
-    async function checkUSB() {
-      try {
-        if (!navigator.usb) {
-          throw new Error('WebUSB not supported');
-        }
-        
-        const devices = await navigator.usb.getDevices();
-        let html = '<ul class="list-disc pl-5">';
-        if (devices.length === 0) {
-          html += '<li>No USB devices currently connected</li>';
-        } else {
-          devices.forEach(device => {
-            html += `
-              <li>
-                <strong>${device.productName || 'Unknown Device'}</strong>
-                <ul class="list-circle pl-5">
-                  <li>Vendor ID: ${device.vendorId}</li>
-                  <li>Product ID: ${device.productId}</li>
-                  <li>Serial Number: ${device.serialNumber || 'N/A'}</li>
-                </ul>
-              </li>`;
-          });
-        }
-        html += '</ul>';
-        document.getElementById('usb-info').innerHTML = html;
-      } catch (e) {
-        document.getElementById('usb-info').textContent = `USB access not available: ${e.message}`;
-      }
-    }
-
-    // Bluetooth Devices
-    async function checkBluetooth() {
-      try {
-        if (!navigator.bluetooth) {
-          throw new Error('Web Bluetooth not supported');
-        }
-
-        document.getElementById('bluetooth-info').textContent = 'Scanning for Bluetooth devices...';
-        
-        const device = await navigator.bluetooth.requestDevice({
-          acceptAllDevices: true
-        });
-        
-        document.getElementById('bluetooth-info').innerHTML = `
-          <ul class="list-disc pl-5">
-            <li>
-              <strong>${device.name || 'Unnamed Device'}</strong>
-              <ul class="list-circle pl-5">
-                <li>ID: ${device.id}</li>
-                <li>Connected: ${device.gatt.connected}</li>
-              </ul>
-            </li>
-          </ul>`;
-      } catch (e) {
-        document.getElementById('bluetooth-info').textContent = `Bluetooth scanning failed: ${e.message}`;
-      }
-    }
-
-    // Barcode Detection
-    async function checkBarcodeDetection() {
-      try {
-        if (!('BarcodeDetector' in window)) {
-          throw new Error('Barcode Detection API not supported');
-        }
-
-        const formats = await BarcodeDetector.getSupportedFormats();
-        let html = '<ul class="list-disc pl-5">';
-        html += '<li>Barcode Detection API is supported</li>';
-        html += '<li>Supported formats:';
-        html += '<ul class="list-circle pl-5">';
-        formats.forEach(format => {
-          html += `<li>${format}</li>`;
-        });
-        html += '</ul></li></ul>';
-        
-        document.getElementById('barcode-info').innerHTML = html;
-      } catch (e) {
-        document.getElementById('barcode-info').textContent = `Barcode detection not available: ${e.message}`;
-      }
-    }
-
-    // Battery Status
-    async function checkBattery() {
-      try {
-        const battery = await navigator.getBattery();
-        document.getElementById('battery-info').innerHTML = `
-          <ul class="list-disc pl-5">
-            <li>Battery Level: ${(battery.level * 100).toFixed(0)}%</li>
-            <li>Charging: ${battery.charging ? 'Yes' : 'No'}</li>
-            <li>Time to full charge: ${battery.charging ? (battery.chargingTime === Infinity ? 'Unknown' : battery.chargingTime + ' seconds') : 'N/A'}</li>
-            <li>Time remaining: ${!battery.charging ? (battery.dischargingTime === Infinity ? 'Unknown' : battery.dischargingTime + ' seconds') : 'N/A'}</li>
-          </ul>`;
-      } catch (e) {
-        document.getElementById('battery-info').textContent = 'Battery status not available';
-      }
-    }
-
-    // Network Information
-    function checkNetwork() {
-      const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-      if (connection) {
-        document.getElementById('network-info').innerHTML = `
-          <ul class="list-disc pl-5">
-            <li>Type: ${connection.type || 'Unknown'}</li>
-            <li>Downlink: ${connection.downlink || 'Unknown'} Mbps</li>
-            <li>Effective Type: ${connection.effectiveType || 'Unknown'}</li>
-            <li>RTT: ${connection.rtt || 'Unknown'} ms</li>
-          </ul>`;
-      } else {
-        document.getElementById('network-info').textContent = 'Network information not available';
-      }
-    }
-
-    // Media Devices
-    async function checkMediaDevices() {
-      try {
-        const devices = await navigator.mediaDevices.enumerateDevices();
-        const devicesByType = devices.reduce((acc, device) => {
-          if (!acc[device.kind]) acc[device.kind] = [];
-          acc[device.kind].push(device.label || `${device.kind} (${acc[device.kind].length + 1})`);
-          return acc;
-        }, {});
-
-        let html = '<ul class="list-disc pl-5">';
-        for (const [type, deviceList] of Object.entries(devicesByType)) {
-          html += `<li>${type}: ${deviceList.length} device(s)`;
-          html += '<ul class="list-circle pl-5">';
-          deviceList.forEach(label => {
-            html += `<li>${label}</li>`;
-          });
-          html += '</ul></li>';
-        }
-        html += '</ul>';
-        
-        document.getElementById('media-devices').innerHTML = html;
-      } catch (e) {
-        document.getElementById('media-devices').textContent = 'Media devices information not available';
-      }
-    }
-
-    // Screen Information
-    function checkScreen() {
-      const screen = window.screen;
-      document.getElementById('screen-info').innerHTML = `
-        <ul class="list-disc pl-5">
-          <li>Screen Width: ${screen.width}px</li>
-          <li>Screen Height: ${screen.height}px</li>
-          <li>Available Width: ${screen.availWidth}px</li>
-          <li>Available Height: ${screen.availHeight}px</li>
-          <li>Color Depth: ${screen.colorDepth} bits</li>
-          <li>Pixel Depth: ${screen.pixelDepth} bits</li>
-          <li>Device Pixel Ratio: ${window.devicePixelRatio}</li>
-        </ul>`;
-    }
-
-    // System Information
-    function checkSystem() {
-      document.getElementById('system-info').innerHTML = `
-        <ul class="list-disc pl-5">
-          <li>Logical Processors: ${navigator.hardwareConcurrency}</li>
-          <li>Memory: ${navigator.deviceMemory ? navigator.deviceMemory + 'GB' : 'Unknown'}</li>
-          <li>Platform: ${navigator.platform}</li>
-          <li>User Agent: ${navigator.userAgent}</li>
-          <li>Language: ${navigator.language}</li>
-          <li>Online Status: ${navigator.onLine ? 'Online' : 'Offline'}</li>
-        </ul>`;
-    }
-
-    // Sensor Information
-    function checkSensors() {
-      const sensors = {
-        'Accelerometer': typeof Accelerometer !== 'undefined',
-        'Gyroscope': typeof Gyroscope !== 'undefined',
-        'Magnetometer': typeof Magnetometer !== 'undefined',
-        'AbsoluteOrientationSensor': typeof AbsoluteOrientationSensor !== 'undefined',
-        'RelativeOrientationSensor': typeof RelativeOrientationSensor !== 'undefined',
-        'AmbientLightSensor': typeof AmbientLightSensor !== 'undefined'
-      };
-
-      let html = '<ul class="list-disc pl-5">';
-      for (const [sensor, available] of Object.entries(sensors)) {
-        html += `<li>${sensor}: ${available ? 'Available' : 'Not Available'}</li>`;
-      }
-      html += '</ul>';
-      
-      document.getElementById('sensor-info').innerHTML = html;
-    }
-
-    // Initialize all checks
-    document.getElementById('check-usb').addEventListener('click', checkUSB);
-    document.getElementById('check-bluetooth').addEventListener('click', checkBluetooth);
-    checkBarcodeDetection();
-    checkBattery();
-    checkNetwork();
-    checkMediaDevices();
-    checkScreen();
-    checkSystem();
-    checkSensors();
-
-    // Add event listeners for real-time updates
-    window.addEventListener('online', checkNetwork);
-    window.addEventListener('offline', checkNetwork);
-    window.addEventListener('resize', checkScreen);
-  </script>
+  <!-- Status Messages Container -->
+  <div id="status" class="fixed bottom-4 right-4 max-w-md bg-white p-4 rounded-lg shadow-lg hidden">
+    <div class="text-sm text-gray-600"></div>
+  </div>
 </body>
+
 </html>
