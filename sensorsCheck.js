@@ -23,7 +23,7 @@ export class SensorsCheck extends DeviceCheck {
 			this.formatList(
 				Object.entries(sensors).map(
 					([sensor, available]) =>
-						`${sensor}: ${available ? "Available" : "Not Available"}`,
+						`${sensor}: ${available ? '<span class="text-green-600">Available</span>' : '<span class="text-red-600">Not Available</span>'}`,
 				),
 				"Sensors",
 			),
